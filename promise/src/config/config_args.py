@@ -29,4 +29,23 @@ parser.add_argument("--checkpoint_sam", default="./checkpoint_sam/sam_vit_b_01ec
 parser.add_argument("--num_prompts", default=1, type=int)
 parser.add_argument("--num_classes", default=2, type=int)
 parser.add_argument("--tolerance", default=5, type=int)
-parser.add_argument("--boundary_kernel_size", default=5, type=i
+parser.add_argument("--boundary_kernel_size", default=5, type=int,
+                    help='an integer for kernel size of avepooling layer for boundary generation')
+parser.add_argument("--use_pretrain", action="store_true")
+parser.add_argument("--pretrain_path", default="", type=str)
+parser.add_argument("--seed", default=42, type=int)
+
+# saving
+parser.add_argument("--save_predictions", action="store_true")
+parser.add_argument("--save_csv", action="store_true")
+parser.add_argument("--save_base_dir", default='', type=str)
+parser.add_argument("--save_name", default='testing_only', type=str)
+
+
+
+
+
+
+def check_and_setup_parser(args):
+    if args.save_name == 'testing_only':
+        warnin
