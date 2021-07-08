@@ -48,4 +48,18 @@ parser.add_argument("--save_name", default='testing_only', type=str)
 
 def check_and_setup_parser(args):
     if args.save_name == 'testing_only':
-        warnin
+        warnings.warn("[save_name] (--save_name) should be a real name, currently is for testing purpose (--save_name=testing_only)")
+
+    device = args.device
+    if args.rand_crop_size == 0:
+        if args.data in ["colon", "pancreas", "lits", "kits"]:
+            args.rand_crop_size = (128, 128, 128)
+    else:
+        if len(args.rand_crop_size) == 1:
+            args.rand_crop_size = tuple(args.rand_crop_size * 3)
+        else:
+            args.rand_crop_size = tuple(args.rand_crop_size)
+
+    args.save_dir = os.path.join(args.save_dir, args.data, args.save_name)
+    if not os.path.exists(args.save_dir):
+      
