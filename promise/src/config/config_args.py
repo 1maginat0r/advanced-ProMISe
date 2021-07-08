@@ -62,4 +62,7 @@ def check_and_setup_parser(args):
 
     args.save_dir = os.path.join(args.save_dir, args.data, args.save_name)
     if not os.path.exists(args.save_dir):
-      
+        os.makedirs(args.save_dir)
+
+    args.save_base_dir = os.path.join(args.save_base_dir, args.data, args.save_name)
+    return device
