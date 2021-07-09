@@ -28,4 +28,28 @@ from monai.losses import DiceCELoss, DiceLoss
 #             augmentation=False,
 #             split=split,
 #             deterministic=True,
-#            
+#             rand_crop_spatial_size=args.rand_crop_size,
+#             num_worker=args.num_worker
+#         )
+#     else:
+#         data = load_data_volume(
+#         data=args.data,
+#         batch_size=1,
+#         data_dir=args.data_dir,
+#         augmentation=False,
+#         split=split,
+#         rand_crop_spatial_size=args.rand_crop_size,
+#         convert_to_sam=False,
+#         do_test_crop=False,
+#         deterministic=True,
+#         num_worker=args.num_worker
+#     )
+#
+#     return data
+
+
+def load_data_set(args, split=''):
+
+    if split == 'train':
+        augmentation = True
+        de
