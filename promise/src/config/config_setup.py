@@ -52,4 +52,29 @@ def load_data_set(args, split=''):
 
     if split == 'train':
         augmentation = True
-        de
+        deterministic = False
+    else:
+        augmentation = False
+        deterministic = True
+        args.batch_size = 1
+
+    data = load_data_volume(
+
+        data=args.data,
+        data_dir=args.data_dir,
+        batch_size=args.batch_size,
+        augmentation=augmentation,
+        split=split,
+        deterministic=deterministic,
+        rand_crop_spatial_size=args.rand_crop_size,
+        num_worker=args.num_worker,
+    )
+
+    return data
+
+
+def load_model(args, logger):
+    if args.split == 'test':
+        if args.use_pretrain:
+            file_path = args.pretrain_path
+        
