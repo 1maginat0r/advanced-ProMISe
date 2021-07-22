@@ -77,4 +77,15 @@ def load_model(args, logger):
     if args.split == 'test':
         if args.use_pretrain:
             file_path = args.pretrain_path
-        
+            logger.info("- using pretrained model: {}".format(args.pretrain_path))
+        else:
+            if args.checkpoint == "last":
+                file = "last.pth.tar"
+            else:
+                file = "best.pth.tar"
+            file_path = os.path.join(args.save_dir, file)
+            logger.info("- using pretrained model: {}".format(file_path))
+        pretrained_model = torch.load(file_path, map_location='cpu')
+    else:
+        # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
+        sam = sam_model_registry["vit_b"](checkpoint=args.
