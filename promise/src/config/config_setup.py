@@ -88,4 +88,24 @@ def load_model(args, logger):
         pretrained_model = torch.load(file_path, map_location='cpu')
     else:
         # please download pretrained SAM model (vit_b), and put it in the "/src/ckpl"
-        sam = sam_model_registry["vit_b"](checkpoint=args.
+        sam = sam_model_registry["vit_b"](checkpoint=args.checkpoint_sam)
+        mask_generator = SamAutomaticMaskGenerator(sam)
+
+    # image encoder
+    img_encoder = Promise(
+            depth=12,
+            embed_dim=768,
+            img_size=1024,
+            mlp_ratio=4,
+            norm_layer=partial(torch.nn.LayerNorm, eps=1e-6),
+            num_heads=12,
+            patch_size=16,
+            qkv_bias=True,
+            use_rel_pos=True,
+            global_attn_indexes=[2, 5, 8, 11],
+            window_size=14,
+            cubic_window_size=8,
+            out_chans=256,
+            num_slice=16)
+    if args.split == 'test':
+        img_encoder.load_state_dict(pre
