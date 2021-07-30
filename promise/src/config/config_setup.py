@@ -122,4 +122,19 @@ def load_model(args, logger):
         for i in img_encoder.blocks:
             for p in i.norm1.parameters():
                 p.requires_grad = True
-   
+            for p in i.adapter.parameters():
+                p.requires_grad = True
+            for p in i.adapter_back.parameters():
+                p.requires_grad = True
+            for p in i.norm2.parameters():
+                p.requires_grad = True
+            i.attn.rel_pos_d = nn.parameter.Parameter(0.5 * (i.attn.rel_pos_h + i.attn.rel_pos_w), requires_grad=True)
+        for i in img_encoder.neck_3d:
+            for p in i.parameters():
+                p.requires_grad = True
+
+    # prompt encoder
+    parameter_list = []
+    prompt_encoder_list = []
+    for i in range(4):
+        prompt_encoder = PromptEncoder(transformer=TwoWa
