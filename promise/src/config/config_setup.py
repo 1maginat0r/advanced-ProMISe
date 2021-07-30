@@ -137,4 +137,20 @@ def load_model(args, logger):
     parameter_list = []
     prompt_encoder_list = []
     for i in range(4):
-        prompt_encoder = PromptEncoder(transformer=TwoWa
+        prompt_encoder = PromptEncoder(transformer=TwoWayTransformer(depth=2,
+                embedding_dim=256,
+                mlp_dim=2048,
+                num_heads=8))
+        if args.split == 'test':
+            prompt_encoder.load_state_dict(pretrained_model["feature_dict"][i], strict=True)
+
+
+        prompt_encoder.to(args.device)
+        parameter_list.extend([i for i in prompt_encoder.parameters() if i.requires_grad == True])
+        prompt_encoder_list.append(prompt_encoder)
+
+    # mask decoder
+    mask_decoder = VIT_MLAHead(img_size=96, num_classes=2).to(args.device)
+    if args.split == 'test':
+        if 'pretrain_promise' in args.pretrain_path:
+            print('using pretrained 
