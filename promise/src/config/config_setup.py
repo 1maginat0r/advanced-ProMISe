@@ -108,4 +108,18 @@ def load_model(args, logger):
             out_chans=256,
             num_slice=16)
     if args.split == 'test':
-        img_encoder.load_state_dict(pre
+        img_encoder.load_state_dict(pretrained_model["encoder_dict"], strict=True)
+        img_encoder.to(args.device)
+    else:
+        img_encoder.load_state_dict(mask_generator.predictor.model.image_encoder.state_dict(), strict=False)
+        del sam
+        img_encoder.to(args.device)
+        for p in img_encoder.parameters():
+            p.requires_grad = False
+        img_encoder.depth_embed.requires_grad = True
+        for p in img_encoder.slice_embed.parameters():
+            p.requires_grad = True
+        for i in img_encoder.blocks:
+            for p in i.norm1.parameters():
+                p.requires_grad = True
+   
