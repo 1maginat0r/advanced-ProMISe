@@ -153,4 +153,14 @@ def load_model(args, logger):
     mask_decoder = VIT_MLAHead(img_size=96, num_classes=2).to(args.device)
     if args.split == 'test':
         if 'pretrain_promise' in args.pretrain_path:
-            print('using pretrained 
+            print('using pretrained ProMISe')
+            pretrained_model['decoder_dict']['head.0.weight'] = pretrained_model['decoder_dict']['cls_hao.0.weight']
+            del pretrained_model['decoder_dict']['cls_hao.0.weight']
+            pretrained_model['decoder_dict']['head.3.weight'] = pretrained_model['decoder_dict']['cls_hao.3.weight']
+            del pretrained_model['decoder_dict']['cls_hao.3.weight']
+
+        mask_decoder.load_state_dict(pretrained_model["decoder_dict"], strict=True)
+    mask_decoder.to(args.device)
+
+
+    model_dict = {'img_encoder': img_encoder, 'prompt_encoder_list': prompt_encoder_list, 'mask_de
