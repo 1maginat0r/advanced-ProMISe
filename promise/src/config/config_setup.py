@@ -163,4 +163,15 @@ def load_model(args, logger):
     mask_decoder.to(args.device)
 
 
-    model_dict = {'img_encoder': img_encoder, 'prompt_encoder_list': prompt_encoder_list, 'mask_de
+    model_dict = {'img_encoder': img_encoder, 'prompt_encoder_list': prompt_encoder_list, 'mask_decoder': mask_decoder}
+
+    if args.split == 'test':
+        img_encoder.eval()
+        for i in prompt_encoder_list:
+            i.eval()
+        mask_decoder.eval()
+        return model_dict
+    else:
+        return model_dict, parameter_list
+
+
