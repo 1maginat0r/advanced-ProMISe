@@ -108,4 +108,17 @@ class Promise(nn.Module):
             rel_pos_zero_init: bool = True,
             window_size: int = 0,
             cubic_window_size: int = 0,
-            global
+            global_attn_indexes: Tuple[int, ...] = (),
+            num_slice = 1
+    ) -> None:
+        """
+        Args:
+            img_size (int): Input image size.
+            patch_size (int): Patch size.
+            in_chans (int): Number of input image channels.
+            embed_dim (int): Patch embedding dimension.
+            depth (int): Depth of ViT.
+            num_heads (int): Number of attention heads in each ViT block.
+            mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
+            qkv_bias (bool): If True, add a learnable bias to query, key, value.
+            norm_layer (nn.Module): Normalization lay
