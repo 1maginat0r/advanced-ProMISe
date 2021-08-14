@@ -145,4 +145,21 @@ class Promise(nn.Module):
                                          groups=embed_dim)
 
         self.pos_embed: Optional[nn.Parameter] = None
-        if use_abs_p
+        if use_abs_pos:
+            # Initialize absolute positional embedding with pretrain image size.
+            self.pos_embed = nn.Parameter(
+                torch.zeros(1, img_size // patch_size, img_size // patch_size, embed_dim)
+            )
+            self.depth_embed = nn.Parameter(
+                torch.ones(1, patch_depth, embed_dim)
+            )
+
+        self.blocks = nn.ModuleList()
+        for i in range(depth):
+            block = Block_3d(
+                dim=embed_dim,
+                num_heads=num_heads,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                norm_layer=norm_layer,
+     
