@@ -175,4 +175,25 @@ class Promise(nn.Module):
         self.neck_3d = nn.ModuleList()
         for i in range(4):
             self.neck_3d.append(nn.Sequential(
-                nn.Conv3d(768, out_chans, 1, bias=False
+                nn.Conv3d(768, out_chans, 1, bias=False),
+                LayerNorm3d(out_chans),
+                nn.Conv3d(
+                    out_chans,
+                    out_chans,
+                    kernel_size=3,
+                    padding=1,
+                    bias=False,
+                ),
+                LayerNorm3d(out_chans),
+            ))
+
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # patch embedding
+        with torch.no_grad():
+            x = self.patch_embed(x)
+
+        if self.num_slice > 1:
+            x = self.slice_embed(x.permute(3, 1, 2, 0).unsqueeze(0))
+            x = x.permute(0, 2, 3, 4, 1)
+        els
