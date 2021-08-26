@@ -278,4 +278,17 @@ class Block_3d(nn.Module):
         self.shift_size = shift
         if self.shift_size > 0:
             # H, W, D = 32, 32, 32
-            H, W, D =
+            H, W, D = depth, depth, depth
+            # H, W, D = 16, 16, 16
+            img_mask = torch.zeros((1, H, W, D, 1))
+            h_slices = (slice(0, -window_size),
+                        slice(-window_size, -self.shift_size),
+                        slice(-self.shift_size, None))
+            w_slices = (slice(0, -window_size),
+                        slice(-window_size, -self.shift_size),
+                        slice(-self.shift_size, None))
+            d_slices = (slice(0, -window_size),
+                        slice(-window_size, -self.shift_size),
+                        slice(-self.shift_size, None))
+            cnt = 0
+    
