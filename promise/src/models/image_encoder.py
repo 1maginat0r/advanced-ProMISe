@@ -291,4 +291,13 @@ class Block_3d(nn.Module):
                         slice(-window_size, -self.shift_size),
                         slice(-self.shift_size, None))
             cnt = 0
-    
+            for h in h_slices:
+                for w in w_slices:
+                    for d in d_slices:
+                        img_mask[:, h, w, d, :] = cnt
+                        cnt += 1
+            mask_windows = window_partition(img_mask, window_size)[0]
+            mask_windows = mask_windows.view(-1, window_size * window_size * window_size)
+            attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
+            attn_mask = attn_mask.masked_fill(attn_mask != 0, float(-100.0)).masked_fill(attn_mask == 0,
+                                          
