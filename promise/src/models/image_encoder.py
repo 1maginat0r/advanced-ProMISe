@@ -316,4 +316,16 @@ class Block_3d(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.adapter(x)
         shortcut = x
-        x = self.norm1(
+        x = self.norm1(x)
+        # Window partition
+        if self.window_size > 0:
+            H, W, D = x.shape[1], x.shape[2], x.shape[3]
+            if self.shift_size > 0:
+                x = torch.roll(x, shifts=(-self.shift_size, -self.shift_size, -self.shift_size), dims=(1,2,3))
+            x, pad_hw = window_partition(x, self.window_size)
+        x = self.attn(x, mask=self.attn_mask)
+        # Reverse window partition
+        if self.window_size > 0:
+            x = window_unpartition(x, self.window_size, pad_hw, (H, W, D))
+        if self.shift_size > 0:
+            x = torch.roll(x, shifts=(self.shift_size, self.shift_size,
