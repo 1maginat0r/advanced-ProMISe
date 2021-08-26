@@ -212,4 +212,26 @@ class Promise(nn.Module):
 
         idx = 0
         feature_list = []
-        for blk in self.blocks[
+        for blk in self.blocks[:6]:
+            x = blk(x)
+            idx += 1
+            if idx % 3 == 0 and idx != 12:
+                feature_list.append(self.neck_3d[idx//3-1](x.permute(0, 4, 1, 2, 3)))
+        for blk in self.blocks[6:12]:
+            x = blk(x)
+            idx += 1
+            if idx % 3 == 0 and idx != 12:
+                feature_list.append(self.neck_3d[idx//3-1](x.permute(0, 4, 1, 2, 3)))
+
+        x = self.neck_3d[-1](x.permute(0, 4, 1, 2, 3))
+
+        return x, feature_list
+
+
+
+
+
+class Block_3d(nn.Module):
+    """Transformer blocks with support of window attention and residual propagation blocks"""
+
+    def __init__(
