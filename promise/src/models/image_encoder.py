@@ -328,4 +328,29 @@ class Block_3d(nn.Module):
         if self.window_size > 0:
             x = window_unpartition(x, self.window_size, pad_hw, (H, W, D))
         if self.shift_size > 0:
-            x = torch.roll(x, shifts=(self.shift_size, self.shift_size,
+            x = torch.roll(x, shifts=(self.shift_size, self.shift_size, self.shift_size), dims=(1,2,3))
+
+        x = shortcut + x
+        x = x + self.mlp(self.norm2(x))
+
+        shortcut_back = x
+        x = shortcut_back + self.adapter_back(x)
+        return x
+
+
+class Attention_3d(nn.Module):
+    """Multi-head Attention block with relative position embeddings."""
+
+    def __init__(
+            self,
+            dim: int,
+            num_heads: int = 8,
+            qkv_bias: bool = True,
+            use_rel_pos: bool = False,
+            rel_pos_zero_init: bool = True,
+            input_size: Optional[Tuple[int, int]] = None,
+            res_size = None
+    ) -> None:
+        """
+        Args:
+ 
