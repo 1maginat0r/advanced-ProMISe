@@ -377,4 +377,16 @@ class Attention_3d(nn.Module):
             # initialize relative positional embeddings
             self.rel_pos_h = nn.Parameter(torch.zeros(2 * res_size[0] - 1, head_dim))
             self.rel_pos_w = nn.Parameter(torch.zeros(2 * res_size[1] - 1, head_dim))
-            self.rel_pos_d = nn.Parameter
+            self.rel_pos_d = nn.Parameter(torch.zeros(2 * res_size[2] - 1, head_dim))
+            self.lr = nn.Parameter(torch.tensor(1.))
+
+    def forward(self, x: torch.Tensor, mask=None) -> torch.Tensor:
+        B, H, W, D, _ = x.shape
+        # qkv with shape (3, B, nHead, H * W, C)
+        qkv = self.qkv(x).reshape(B, H * W * D, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)
+        # q, k, v with shape (B * nHead, H * W, C)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+        #q, k, v = qkv.reshape(3, B * self.num_heads, H * W * D, -1).unbind(0)
+        q_sub = q.reshape(B * self.num_heads, H * W * D, -1)
+
+        attn = (q * self.scale) @ k.tran
