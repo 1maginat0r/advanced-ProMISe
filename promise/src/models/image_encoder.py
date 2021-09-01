@@ -363,4 +363,18 @@ class Attention_3d(nn.Module):
         """
         super().__init__()
         self.num_heads = num_heads
-        head_dim = di
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.proj = nn.Linear(dim, dim)
+
+        self.use_rel_pos = use_rel_pos
+        if self.use_rel_pos:
+            assert (
+                    input_size is not None
+            ), "Input size must be provided if using relative positional encoding."
+            # initialize relative positional embeddings
+            self.rel_pos_h = nn.Parameter(torch.zeros(2 * res_size[0] - 1, head_dim))
+            self.rel_pos_w = nn.Parameter(torch.zeros(2 * res_size[1] - 1, head_dim))
+            self.rel_pos_d = nn.Parameter
