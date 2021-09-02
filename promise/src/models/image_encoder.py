@@ -389,4 +389,16 @@ class Attention_3d(nn.Module):
         #q, k, v = qkv.reshape(3, B * self.num_heads, H * W * D, -1).unbind(0)
         q_sub = q.reshape(B * self.num_heads, H * W * D, -1)
 
-        attn = (q * self.scale) @ k.tran
+        attn = (q * self.scale) @ k.transpose(-2, -1)
+
+        if self.use_rel_pos:
+            attn = add_decomposed_rel_pos(attn, q_sub, self.rel_pos_h, self.rel_pos_w, self.rel_pos_d, (H, W, D), (H, W, D), self.lr)
+            attn = attn.reshape(B, self.num_heads, H * W * D, -1)
+        if mask is None:
+            attn = attn.softmax(dim=-1)
+        else:
+            nW = mask.shape[0]
+            attn = attn.view(B // nW, nW, self.num_heads, H*W*D, H*W*D) + mask.unsqueeze(1).unsqueeze(0)
+            attn = attn.view(-1, self.num_heads, H*W*D, H*W*D)
+            attn = attn.softmax(dim=-1)
+        x = (attn @ v).view(B, self.num_head
