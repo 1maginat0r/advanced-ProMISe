@@ -418,3 +418,18 @@ def window_partition(x: torch.Tensor, window_size: int) -> Tuple[torch.Tensor, T
         (Hp, Wp): padded height and width before partition
     """
     B, H, W, D, C = x.shape
+
+    pad_h = (window_size - H % window_size) % window_size
+    pad_w = (window_size - W % window_size) % window_size
+    pad_d = (window_size - D % window_size) % window_size
+    if pad_h > 0 or pad_w > 0 or pad_d > 0:
+        x = F.pad(x, (0, 0, 0, pad_d, 0, pad_w, 0, pad_h))
+    Hp, Wp, Dp = H + pad_h, W + pad_w, D + pad_d
+
+    x = x.view(B, Hp // window_size, window_size, Wp // window_size, window_size, Dp // window_size, window_size, C)
+    windows = x.permute(0, 1, 3, 5, 2, 4, 6, 7).contiguous().view(-1, window_size, window_size, window_size, C)
+    return windows, (Hp, Wp, Dp)
+
+
+def window_unpartition(
+        windows: torch
