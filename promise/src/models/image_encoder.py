@@ -446,4 +446,20 @@ def window_unpartition(
     """
     Hp, Wp, Dp = pad_hw
     H, W, D = hw
-    B = windows.shape[0] // (Hp * Wp * Dp // window_size // window_
+    B = windows.shape[0] // (Hp * Wp * Dp // window_size // window_size // window_size)
+    x = windows.view(B, Hp // window_size, Wp // window_size, Dp // window_size, window_size, window_size, window_size,
+                     -1)
+    x = x.permute(0, 1, 4, 2, 5, 3, 6, 7).contiguous().view(B, Hp, Wp, Dp, -1)
+
+    if Hp > H or Wp > W or Dp > D:
+        x = x[:, :H, :W, :D, :].contiguous()
+    return x
+
+
+def get_rel_pos(q_size: int, k_size: int, rel_pos: torch.Tensor) -> torch.Tensor:
+    """
+    Get relative positional embeddings according to the relative positions of
+        query and key sizes.
+    Args:
+        q_size (int): size of query q.
+        k_size (int): size of key k
