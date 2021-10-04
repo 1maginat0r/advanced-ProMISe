@@ -581,3 +581,18 @@ class ImageEncoderViT_3d_v2_original(nn.Module):
         self.patch_depth = patch_depth
         self.patch_embed = PatchEmbed(
             kernel_size=(patch_size, patch_size),
+            stride=(patch_size, patch_size),
+            in_chans=in_chans,
+            embed_dim=embed_dim,
+        )
+        self.num_slice = num_slice
+        if self.num_slice > 1:
+            self.slice_embed = nn.Conv3d(in_channels=embed_dim, out_channels=embed_dim,
+                                         kernel_size=(1,1,self.num_slice), stride=(1,1,self.num_slice),
+                                         groups=embed_dim)
+
+        self.pos_embed: Optional[nn.Parameter] = None
+        if use_abs_pos:
+            # Initialize absolute positional embedding with pretrain image size.
+            self.pos_embed = nn.Parameter(
+ 
