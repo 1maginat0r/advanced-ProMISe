@@ -570,4 +570,14 @@ class ImageEncoderViT_3d_v2_original(nn.Module):
             qkv_bias (bool): If True, add a learnable bias to query, key, value.
             norm_layer (nn.Module): Normalization layer.
             act_layer (nn.Module): Activation layer.
-            use_abs_pos (bo
+            use_abs_pos (bool): If True, use absolute positional embeddings.
+            use_rel_pos (bool): If True, add relative positional embeddings to the attention map.
+            rel_pos_zero_init (bool): If True, zero initialize relative positional parameters.
+            window_size (int): Window size for window attention blocks.
+            global_attn_indexes (list): Indexes for blocks using global attention.
+        """
+        super().__init__()
+        self.img_size = img_size
+        self.patch_depth = patch_depth
+        self.patch_embed = PatchEmbed(
+            kernel_size=(patch_size, patch_size),
