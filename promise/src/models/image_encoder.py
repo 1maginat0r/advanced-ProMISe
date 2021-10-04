@@ -542,4 +542,22 @@ class ImageEncoderViT_3d_v2_original(nn.Module):
             patch_depth: int = 32,
             #patch_depth: int = 32,
             in_chans: int = 3,
-            embed_dim: i
+            embed_dim: int = 768,
+            depth: int = 12,
+            num_heads: int = 12,
+            mlp_ratio: float = 4.0,
+            out_chans: int = 256,
+            qkv_bias: bool = True,
+            norm_layer: Type[nn.Module] = nn.LayerNorm,
+            act_layer: Type[nn.Module] = nn.GELU,
+            use_abs_pos: bool = True,
+            use_rel_pos: bool = False,
+            rel_pos_zero_init: bool = True,
+            window_size: int = 0,
+            cubic_window_size: int = 0,
+            global_attn_indexes: Tuple[int, ...] = (),
+            num_slice = 1
+    ) -> None:
+        """
+        Args:
+            img_siz
