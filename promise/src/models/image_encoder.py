@@ -506,4 +506,19 @@ def add_decomposed_rel_pos(
         q (Tensor): query q in the attention layer with shape (B, q_h * q_w, C).
         rel_pos_h (Tensor): relative position embeddings (Lh, C) for height axis.
         rel_pos_w (Tensor): relative position embeddings (Lw, C) for width axis.
-        q_size (Tuple): spa
+        q_size (Tuple): spatial sequence size of query q with (q_h, q_w).
+        k_size (Tuple): spatial sequence size of key k with (k_h, k_w).
+    Returns:
+        attn (Tensor): attention map with added relative positional embeddings.
+    """
+    q_h, q_w, q_d = q_size
+    k_h, k_w, k_d = k_size
+    Rh = get_rel_pos(q_h, k_h, rel_pos_h)
+    Rw = get_rel_pos(q_w, k_w, rel_pos_w)
+    Rd = get_rel_pos(q_d, k_d, rel_pos_d)
+
+    B, _, dim = q.shape
+    r_q = q.reshape(B, q_h, q_w, q_d, dim)
+    rel_h = torch.einsum("bhwdc,hkc->bhwdk", r_q, Rh)
+    rel_w = torch.einsum("bhwdc,wkc->bhwdk", r_q, Rw)
+    rel_d = torch.einsu
