@@ -521,4 +521,25 @@ def add_decomposed_rel_pos(
     r_q = q.reshape(B, q_h, q_w, q_d, dim)
     rel_h = torch.einsum("bhwdc,hkc->bhwdk", r_q, Rh)
     rel_w = torch.einsum("bhwdc,wkc->bhwdk", r_q, Rw)
-    rel_d = torch.einsu
+    rel_d = torch.einsum("bhwdc,dkc->bhwdk", r_q, Rd)
+
+    attn = (
+            attn.view(B, q_h, q_w, q_d, k_h, k_w, k_d) +
+            lr * rel_h[:, :, :, :, :, None, None] +
+            lr * rel_w[:, :, :, :, None, :, None] +
+            lr * rel_d[:, :, :, :, None, None, :]
+    ).view(B, q_h * q_w * q_d, k_h * k_w * k_d)
+
+    return attn
+
+
+
+class ImageEncoderViT_3d_v2_original(nn.Module):
+    def __init__(
+            self,
+            img_size: int = 1024,
+            patch_size: int = 16,
+            patch_depth: int = 32,
+            #patch_depth: int = 32,
+            in_chans: int = 3,
+            embed_dim: i
