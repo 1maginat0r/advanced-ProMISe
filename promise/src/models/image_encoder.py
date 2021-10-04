@@ -560,4 +560,14 @@ class ImageEncoderViT_3d_v2_original(nn.Module):
     ) -> None:
         """
         Args:
-            img_siz
+            img_size (int): Input image size.
+            patch_size (int): Patch size.
+            in_chans (int): Number of input image channels.
+            embed_dim (int): Patch embedding dimension.
+            depth (int): Depth of ViT.
+            num_heads (int): Number of attention heads in each ViT block.
+            mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
+            qkv_bias (bool): If True, add a learnable bias to query, key, value.
+            norm_layer (nn.Module): Normalization layer.
+            act_layer (nn.Module): Activation layer.
+            use_abs_pos (bo
