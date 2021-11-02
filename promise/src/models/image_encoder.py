@@ -649,4 +649,21 @@ class ImageEncoderViT_3d_v2_original(nn.Module):
             x = x.permute(1, 2, 0, 3).unsqueeze(0)
 
         x = x.permute(0, 4, 1, 2, 3)
-        # x 
+        # x = self.m1(x)
+        # x = self.m2(x)
+        x = x.permute(0, 2, 3, 4, 1)
+
+        """
+        position embedding
+        """
+        if self.pos_embed is not None:
+            #pos_embed = F.avg_pool2d(self.pos_embed.permute(0,3,1,2), kernel_size=1).permute(0,2,3,1).unsqueeze(3)
+            pos_embed = F.avg_pool2d(self.pos_embed.permute(0,3,1,2), kernel_size=int(64 / self.patch_depth)).permute(0,2,3,1).unsqueeze(3)
+            pos_embed = pos_embed + (self.depth_embed.unsqueeze(1).unsqueeze(1))
+            x = x + pos_embed
+
+        idx = 0
+        feature_list = []
+        for blk in self.blocks[:6]:
+            x = blk(x)
+            idx +=
