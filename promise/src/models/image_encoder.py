@@ -611,4 +611,19 @@ class ImageEncoderViT_3d_v2_original(nn.Module):
                 qkv_bias=qkv_bias,
                 norm_layer=norm_layer,
                 act_layer=act_layer,
-                use_r
+                use_rel_pos=use_rel_pos,
+                rel_pos_zero_init=rel_pos_zero_init,
+                window_size=cubic_window_size,
+                res_size=window_size if i not in global_attn_indexes else img_size // patch_size,
+                shift=cubic_window_size // 2 if i % 2 == 0 else 0,
+                depth=self.patch_depth
+            )
+            self.blocks.append(block)
+
+        self.neck_3d = nn.ModuleList()
+        for i in range(4):
+            self.neck_3d.append(nn.Sequential(
+                nn.Conv3d(768, out_chans, 1, bias=False),
+                LayerNorm3d(out_chans),
+                nn.Conv3d(
+                    out_chan
