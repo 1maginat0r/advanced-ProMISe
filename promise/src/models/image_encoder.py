@@ -709,4 +709,21 @@ class Block_3d_original(nn.Module):
             rel_pos_zero_init (bool): If True, zero initialize relative positional parameters.
             window_size (int): Window size for window attention blocks. If it equals 0, then
                 use global attention.
-            input_size (tuple(int, int) or None): Input resolution for calculating the 
+            input_size (tuple(int, int) or None): Input resolution for calculating the relative
+                positional parameter size.
+        """
+        super().__init__()
+        self.norm1 = norm_layer(dim)
+        self.attn = Attention_3d(
+            dim,
+            num_heads=num_heads,
+            qkv_bias=qkv_bias,
+            use_rel_pos=use_rel_pos,
+            rel_pos_zero_init=rel_pos_zero_init,
+            input_size=(window_size, window_size, window_size),
+            res_size=(res_size, res_size, res_size),
+        )
+        self.shift_size = shift
+        if self.shift_size > 0:
+            # H, W, D = 32, 32, 32
+            H, W, D = depth, depth, depth
