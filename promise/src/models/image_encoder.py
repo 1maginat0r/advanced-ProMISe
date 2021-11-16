@@ -779,4 +779,4 @@ class Block_3d_original(nn.Module):
 
         x = shortcut + x
         x = x + self.mlp(self.norm2(x))
-        return
+        return x
