@@ -748,4 +748,22 @@ class Block_3d_original(nn.Module):
             mask_windows = mask_windows.view(-1, window_size * window_size * window_size)
             attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
             attn_mask = attn_mask.masked_fill(attn_mask != 0, float(-100.0)).masked_fill(attn_mask == 0,
-                   
+                                                                                         float(0.0))
+        else:
+            attn_mask = None
+        self.register_buffer("attn_mask", attn_mask)
+
+
+        self.norm2 = norm_layer(dim)
+        self.mlp = MLPBlock(embedding_dim=dim, mlp_dim=int(dim * mlp_ratio), act=act_layer)
+
+        self.window_size = window_size
+        self.adapter = Adapter(input_dim=dim, mid_dim=dim // 2)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.adapter(x)
+        shortcut = x
+        x = self.norm1(x)
+        # Window partition
+        if self.window_size > 0:
+           
