@@ -19,4 +19,14 @@ class MLAHead(nn.Module):
         self.head4 = nn.Sequential(nn.Conv3d(mla_channels, mlahead_channels, 3, padding=1, bias=False),
                      nn.InstanceNorm3d(mlahead_channels),
                      nn.ReLU(),
-                     nn.Conv3d(mlahead_channels, mlahead_c
+                     nn.Conv3d(mlahead_channels, mlahead_channels, 3, padding=1, bias=False),
+                     nn.InstanceNorm3d(mlahead_channels),
+                     nn.ReLU())
+        self.head5 = nn.Sequential(nn.Conv3d(mla_channels, mlahead_channels, 3, padding=1, bias=False),
+                     nn.InstanceNorm3d(mlahead_channels),
+                     nn.ReLU(),
+                     nn.Conv3d(mlahead_channels, mlahead_channels, 3, padding=1, bias=False),
+                     nn.InstanceNorm3d(mlahead_channels),
+                     nn.ReLU())
+
+        self.up2 = nn.ConvTranspose3d(mlahead_channels, mlahe
