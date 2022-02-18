@@ -41,4 +41,21 @@ class MLAHead(nn.Module):
         head3 = self.up3(self.head3(mla_p3))
         head4 = self.up4(self.head4(mla_p4))
         head5 = self.up5(self.head5(mla_p5))
-        return torch.cat([head2, head3, hea
+        return torch.cat([head2, head3, head4, head5], dim=1)
+
+
+class VIT_MLAHead(nn.Module):
+    """ Vision Transformer with support for patch or hybrid CNN input stage
+    """
+
+    def __init__(self, img_size=768, mla_channels=256, mlahead_channels=128, num_classes=2,
+                 norm_layer=nn.BatchNorm2d, norm_cfg=None, **kwargs):
+        super(VIT_MLAHead, self).__init__(**kwargs)
+        self.img_size = img_size
+        self.norm_cfg = norm_cfg
+        self.mla_channels = mla_channels
+        self.BatchNorm = norm_layer
+        self.mlahead_channels = mlahead_channels
+
+        self.mlahead = MLAHead(mla_channels=self.mla_channels,
+                      
