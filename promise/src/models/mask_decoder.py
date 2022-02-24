@@ -58,4 +58,16 @@ class VIT_MLAHead(nn.Module):
         self.mlahead_channels = mlahead_channels
 
         self.mlahead = MLAHead(mla_channels=self.mla_channels,
-                      
+                               mlahead_channels=self.mlahead_channels, norm_cfg=self.norm_cfg)
+
+
+        self.head = nn.Sequential(nn.Conv3d(5 * mlahead_channels + 1, mlahead_channels, 3, padding=1, bias=False),
+                     nn.InstanceNorm3d(mlahead_channels),
+                     nn.ReLU(),
+                     nn.Conv3d(mlahead_channels, num_classes, 3, padding=1, bias=False))
+
+        self.image_feature_extractor = nn.Sequential(
+                     nn.Conv3d(1, mlahead_channels, 3, padding=1, bias=False),
+                     nn.InstanceNorm3d(mlahead_channels),
+                     nn.ReLU(),
+         
