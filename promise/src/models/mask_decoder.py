@@ -70,4 +70,15 @@ class VIT_MLAHead(nn.Module):
                      nn.Conv3d(1, mlahead_channels, 3, padding=1, bias=False),
                      nn.InstanceNorm3d(mlahead_channels),
                      nn.ReLU(),
-         
+                     nn.Conv3d(mlahead_channels, mlahead_channels, 3, padding=1, bias=False),
+                     nn.InstanceNorm3d(mlahead_channels),
+                     nn.ReLU(),
+                     )
+
+
+    def forward(self, inputs, scale_factor1, scale_factor2):
+        x = self.mlahead(inputs[0], inputs[1], inputs[2], inputs[3], scale_factor=scale_factor1)
+        image_features = self.image_feature_extractor(inputs[-1])
+        x = torch.cat([x, image_features, inputs[-1]], dim=1)
+        x = self.head(x)
+        x = F.interpolate(x, scale_factor=scale_factor2, mode='trilinear', align_corners=True
