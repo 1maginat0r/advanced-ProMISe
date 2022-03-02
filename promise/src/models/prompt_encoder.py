@@ -16,4 +16,23 @@ class LayerNorm3d(nn.Module):
         self.eps = eps
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        u = x.mean(1, k
+        u = x.mean(1, keepdim=True)
+        s = (x - u).pow(2).mean(1, keepdim=True)
+        x = (x - u) / torch.sqrt(s + self.eps)
+        x = self.weight[:, None, None, None] * x + self.bias[:, None, None, None]
+        return x
+
+class Adapter(nn.Module):
+    def __init__(self, input_dim, mid_dim):
+        super().__init__()
+        self.model = MLP(
+            input_dim=input_dim, hidden_dim=mid_dim, output_dim=input_dim, num_layers=2
+        )
+
+    def forward(self, features):
+        out = features + self.model(features)
+        return out
+
+
+# Lightly adapted from
+# https://github.com/facebookresearch/MaskFormer/blob/main/mask_form
