@@ -81,4 +81,5 @@ class VIT_MLAHead(nn.Module):
         image_features = self.image_feature_extractor(inputs[-1])
         x = torch.cat([x, image_features, inputs[-1]], dim=1)
         x = self.head(x)
-        x = F.interpolate(x, scale_factor=scale_factor2, mode='trilinear', align_corners=True
+        x = F.interpolate(x, scale_factor=scale_factor2, mode='trilinear', align_corners=True)
+        return x
