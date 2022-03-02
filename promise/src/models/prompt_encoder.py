@@ -129,4 +129,26 @@ class TwoWayTransformer(nn.Module):
         image_embedding = image_embedding.flatten(2).permute(0, 2, 1)
         image_pe = image_pe.flatten(2).permute(0, 2, 1)
         # Apply transformer blocks and final layernorm
-        for layer in self.
+        for layer in self.layers:
+            image_embedding, point_embedding = layer(
+                image_embedding,
+                point_embedding,
+                image_pe,
+                point_pe,
+            )
+        return image_embedding
+
+
+class TwoWayAttentionBlock(nn.Module):
+    def __init__(
+        self,
+        embedding_dim: int,
+        num_heads: int,
+        mlp_dim: int = 2048,
+        activation: Type[nn.Module] = nn.ReLU,
+        attention_downsample_rate: int = 2,
+        skip_first_layer_pe: bool = False,
+    ) -> None:
+        """
+        A transformer block with four layers: (1) self-attention of sparse
+        inputs, (2) 
