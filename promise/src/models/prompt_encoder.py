@@ -90,4 +90,22 @@ class TwoWayTransformer(nn.Module):
         self.layers = nn.ModuleList()
 
         for i in range(depth):
-    
+            self.layers.append(
+                TwoWayAttentionBlock(
+                    embedding_dim=embedding_dim,
+                    num_heads=num_heads,
+                    mlp_dim=mlp_dim,
+                    activation=activation,
+                    attention_downsample_rate=attention_downsample_rate,
+                    skip_first_layer_pe=(i == 0),
+                )
+            )
+
+    def forward(
+        self,
+        image_embedding: Tensor,
+        image_pe: Tensor,
+        point_coord,
+    ) -> Tuple[Tensor, Tensor]:
+        """
+       
