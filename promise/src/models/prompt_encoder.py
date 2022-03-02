@@ -119,4 +119,14 @@ class TwoWayTransformer(nn.Module):
           torch.Tensor: the processed point_embedding
           torch.Tensor: the processed image_embedding
         """
-        # BxCxHxW -> Bx
+        # BxCxHxW -> BxHWxC == B x N_image_tokens x C
+
+        point_embedding = F.grid_sample(image_embedding, point_coord, align_corners=False).squeeze(2).squeeze(2)
+        point_pe = F.grid_sample(image_pe, point_coord, align_corners=False).squeeze(2).squeeze(2)
+        point_pe = point_pe.permute(0, 2, 1)
+        point_embedding = point_embedding.permute(0, 2, 1)
+        original_shape = image_embedding.shape
+        image_embedding = image_embedding.flatten(2).permute(0, 2, 1)
+        image_pe = image_pe.flatten(2).permute(0, 2, 1)
+        # Apply transformer blocks and final layernorm
+        for layer in self.
