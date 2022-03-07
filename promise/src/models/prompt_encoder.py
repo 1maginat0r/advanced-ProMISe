@@ -193,4 +193,25 @@ class TwoWayAttentionBlock(nn.Module):
 
         # MLP block
         mlp_out = self.mlp(queries)
-        queries = qu
+        queries = queries + mlp_out
+        queries = self.norm3(queries)
+
+        # Cross attention block, image embedding attending to tokens
+        attn_out = self.cross_attn_image_to_token(q=img_embed, k=queries, v=queries)
+        keys = img_embed + attn_out
+        keys = self.norm4(keys)
+
+        return keys, point_embed
+
+
+class Attention(nn.Module):
+    """
+    An attention layer that allows for downscaling the size of the embedding
+    after projection to queries, keys, and values.
+    """
+
+    def __init__(
+        self,
+        embedding_dim: int,
+        num_heads: int,
+      
