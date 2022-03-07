@@ -177,4 +177,20 @@ class TwoWayAttentionBlock(nn.Module):
         self.cross_attn_image_to_token = Attention(
             embedding_dim, num_heads, downsample_rate=attention_downsample_rate
         )
-        self.global_query = nn.parameter.Parameter
+        self.global_query = nn.parameter.Parameter(data=0.1 * torch.randn(1, 10, embedding_dim))
+
+    def forward(self, img_embed, point_embed, img_pe, point_pe) -> Tuple[Tensor, Tensor]:
+
+        q = torch.cat([self.global_query, point_embed], dim=1)
+        self_out = self.self_attn(q=q, k=q, v=q)
+        self_out = self.norm1(self_out)
+
+        # Cross attention block, tokens attending to image embedding
+        queries = q + self_out
+        queries = self.norm2(queries)
+        point_embed = queries[:, 10:, :]
+        queries = queries[:, :10, :]
+
+        # MLP block
+        mlp_out = self.mlp(queries)
+        queries = qu
