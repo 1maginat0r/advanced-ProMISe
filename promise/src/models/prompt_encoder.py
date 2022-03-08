@@ -290,4 +290,21 @@ class PromptEncoder(nn.Module):
         self.transformer = transformer
         self.register_buffer(
             "positional_encoding_gaussian_matrix",
-            
+             torch.randn((3, num_pos_feats)),
+        )
+        self.mask_prompt = mask_prompt
+        if mask_prompt:
+            self.default_prompt = nn.parameter.Parameter(torch.randn(1, 256, 32, 32, 32))
+            self.mask_encoder = nn.Sequential(
+            nn.Conv3d(1, 256 // 4, kernel_size=3, stride=3),
+            LayerNorm3d(256 // 4),
+            nn.GELU(),
+            nn.Conv3d(256 // 4, 256, kernel_size=3, padding = 1, stride=1),
+            LayerNorm3d(256),
+            nn.GELU(),
+            nn.Conv3d(256, 256, kernel_size=1),
+            )
+
+    def forward(
+        self,
+        image_embeddings: torch.Tenso
