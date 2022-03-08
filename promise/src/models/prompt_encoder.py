@@ -267,4 +267,27 @@ class MLPBlock(nn.Module):
         self,
         embedding_dim: int,
         mlp_dim: int,
-        act: Type[nn.Module] = nn.
+        act: Type[nn.Module] = nn.GELU,
+    ) -> None:
+        super().__init__()
+        self.lin1 = nn.Linear(embedding_dim, mlp_dim)
+        self.lin2 = nn.Linear(mlp_dim, embedding_dim)
+        self.act = act()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.lin2(self.act(self.lin1(x)))
+
+
+class PromptEncoder(nn.Module):
+    def __init__(
+        self,
+        *,
+        transformer: nn.Module,
+        num_pos_feats: int = 128,
+        mask_prompt = False
+    ) -> None:
+        super().__init__()
+        self.transformer = transformer
+        self.register_buffer(
+            "positional_encoding_gaussian_matrix",
+            
