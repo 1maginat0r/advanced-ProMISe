@@ -307,4 +307,19 @@ class PromptEncoder(nn.Module):
 
     def forward(
         self,
-        image_embeddings: torch.Tenso
+        image_embeddings: torch.Tensor,
+        point_coord,
+        img_size=[512, 512, 32],
+        feat_size=[32, 32, 32]
+        # img_size=[256, 256, 16],
+        # feat_size=[16, 16, 16]
+        # img_size = [512, 512, 64],
+        # feat_size = [64, 64, 64]
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Predict masks given image and prompt embeddings.
+        Arguments:
+          image_embeddings (torch.Tensor): the embeddings from the image encoder
+          image_pe (torch.Tensor): positional encoding with the shape of image_embeddings
+          sparse_prompt_embeddings (torch.Tensor): the embeddings of the points and boxes
+       
