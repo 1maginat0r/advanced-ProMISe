@@ -335,4 +335,16 @@ class PromptEncoder(nn.Module):
             if masks == None:
                 image_embeddings += self.default_prompt
             else:
-                image_embeddings += self.mask_encoder(mas
+                image_embeddings += self.mask_encoder(masks)
+        '''
+        point_coord[:, :, 0] = (point_coord[:, :, 0]+0.5) * 2 / img_size[2] - 1
+        point_coord[:, :, 1] = (point_coord[:, :, 1]+0.5) * 2 / img_size[1] - 1
+        point_coord[:, :, 2] = (point_coord[:, :, 2]+0.5) * 2 / img_size[0] - 1
+        point_coord = point_coord.reshape(1,1,1,-1,3)
+        features = self.transformer(image_embeddings, image_pe, point_coord)
+        features = features.transpose(1,2).reshape([1, -1] + feat_size)
+
+        return features
+
+    def _pe_encoding(self, coords: torch.Tensor) -> torch.Tensor:
+        """Positionally encode points that
