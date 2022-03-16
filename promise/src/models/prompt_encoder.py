@@ -371,4 +371,9 @@ class PromptEncoder(nn.Module):
         y_embed = grid.cumsum(dim=0) - 0.5
         x_embed = grid.cumsum(dim=1) - 0.5
         z_embed = grid.cumsum(dim=2) - 0.5
-        y_embed = y_embed / 
+        y_embed = y_embed / h
+        x_embed = x_embed / w
+        z_embed = z_embed / d
+
+        pe = self._pe_encoding(torch.stack([x_embed, y_embed, z_embed], dim=-1))
+        return pe.permute(3, 0, 1, 2).unsqueeze(0)  # C x D X H x W
