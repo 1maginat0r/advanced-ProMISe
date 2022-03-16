@@ -359,4 +359,16 @@ class PromptEncoder(nn.Module):
     ) -> torch.Tensor:
         """Positionally encode points that are not normalized to [0,1]."""
         coords = coords_input.clone()
-        coords[:, :, 0] = coords[:, :, 0] / i
+        coords[:, :, 0] = coords[:, :, 0] / image_size[1]
+        coords[:, :, 1] = coords[:, :, 1] / image_size[0]
+        coords[:, :, 2] = coords[:, :, 2] / image_size[2]
+        return self._pe_encoding(coords.to(torch.float))  # B x N x C
+
+    def get_img_pe(self, size: Tuple[int, int], device) -> torch.Tensor:
+        """Generate positional encoding for a grid of the specified size."""
+        h, w, d = size
+        grid = torch.ones((h, w, d), device=device, dtype=torch.float32)
+        y_embed = grid.cumsum(dim=0) - 0.5
+        x_embed = grid.cumsum(dim=1) - 0.5
+        z_embed = grid.cumsum(dim=2) - 0.5
+        y_embed = y_embed / 
