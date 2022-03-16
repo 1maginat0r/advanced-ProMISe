@@ -347,4 +347,16 @@ class PromptEncoder(nn.Module):
         return features
 
     def _pe_encoding(self, coords: torch.Tensor) -> torch.Tensor:
-        """Positionally encode points that
+        """Positionally encode points that are normalized to [0,1]."""
+        # assuming coords are in [0, 1]^2 square and have d_1 x ... x d_n x 2 shape
+        coords = 2 * coords - 1
+        coords = coords @ self.positional_encoding_gaussian_matrix
+        coords = 2 * np.pi * coords * 3 / 2
+        return torch.cat([torch.sin(coords), torch.cos(coords)], dim=-1)
+
+    def forward_with_coords(
+        self, coords_input: torch.Tensor, image_size: Tuple[int, int]
+    ) -> torch.Tensor:
+        """Positionally encode points that are not normalized to [0,1]."""
+        coords = coords_input.clone()
+        coords[:, :, 0] = coords[:, :, 0] / i
