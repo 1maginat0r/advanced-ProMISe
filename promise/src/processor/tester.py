@@ -93,4 +93,15 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
 
     img_patch = img[:, :, d_min:d_max, h_min:h_max, w_min:w_max].clone()
     # the pad follows the format (pad ordering) of torch
-    # pad deals the points that ar
+    # pad deals the points that are not included in the original patch (default size: 128^3)
+    # if such case happens, the points values are negative
+    # global query in prompt encoder is a learnable variable
+    # this may because the point values represent the coordinate information with a shifted origin (-d_min, -h_min, -w_min)
+    img_patch = F.pad(img_patch, (w_l, w_r, h_l, h_r, d_l, d_r)) # follow the format of torch pad function
+
+    pred = model_predict(args,
+                         img_patch,
+                         points_torch,
+                         img_encoder,
+                         prompt_encoder_list,
+            
