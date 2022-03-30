@@ -52,4 +52,26 @@ def get_points_prompt(args, points_dict, cumulative=False):
     h_min = z_m - patch_size // 2
     h_max = z_m + patch_size // 2
     w_min = y_m - patch_size // 2
-    w_max = y_m +
+    w_max = y_m + patch_size // 2
+
+
+
+    points = torch.cat([z - d_min, x - w_min, y - h_min], dim=1).unsqueeze(1).float()
+    points_torch = points.to(args.device)
+
+    patch_dict = {'w_min': w_min, 'w_max': w_max, 'h_min': h_min, 'h_max': h_max, 'd_min': d_min, 'd_max': d_max}
+
+    return points_torch, patch_dict
+
+
+
+def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_encoder_list, mask_decoder):
+    seg = seg_dict['seg']
+
+    device = args.device
+    patch_size = args.rand_crop_size[0]
+
+    points_torch, patch_dict = get_points_prompt(args, points_dict)
+
+
+    w_min, w
