@@ -104,4 +104,14 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
                          points_torch,
                          img_encoder,
                          prompt_encoder_list,
-            
+                         mask_decoder)
+    pred = pred[:, :, d_l:patch_size - d_r, h_l:patch_size - h_r, w_l:patch_size - w_r]
+    pred = F.softmax(pred, dim=1)[:, 1]
+    # seg_pred is not meta tensor
+    # seg_pred = torch.zeros(1, 1, points_dict['x_dimension'], points_dict['z_dimension'], points_dict['y_dimension']).to(device)
+    # zeros_like carries meta tensor
+    seg_pred = torch.zeros_like(img).to(device)[:, 0, :].unsqueeze(0)
+    seg_pred[:, :, d_min:d_max, h_min:h_max, w_min:w_max] += pred
+
+    final_pred = F.interpolate(seg_pred, size=seg.shape[2:], mode="trilinear")
+    img_orig = F.interpolate(img, size=seg.shape[2:], mode="
