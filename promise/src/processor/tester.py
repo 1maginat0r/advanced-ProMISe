@@ -74,4 +74,23 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
     points_torch, patch_dict = get_points_prompt(args, points_dict)
 
 
-    w_min, w
+    w_min, w_max = patch_dict['w_min'], patch_dict['w_max']
+    h_min, h_max = patch_dict['h_min'], patch_dict['h_max']
+    d_min, d_max = patch_dict['d_min'], patch_dict['d_max']
+
+
+
+    w_l = max(0, -w_min)
+    w_r = max(0, w_max - points_dict['z_dimension'])
+    h_l = max(0, -h_min)
+    h_r = max(0, h_max - points_dict['y_dimension'])
+    d_l = max(0, -d_min)
+    d_r = max(0, d_max - points_dict['x_dimension'])
+
+    d_min = max(0, d_min)
+    h_min = max(0, h_min)
+    w_min = max(0, w_min)
+
+    img_patch = img[:, :, d_min:d_max, h_min:h_max, w_min:w_max].clone()
+    # the pad follows the format (pad ordering) of torch
+    # pad deals the points that ar
