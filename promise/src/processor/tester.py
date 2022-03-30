@@ -38,4 +38,18 @@ def get_points_prompt(args, points_dict, cumulative=False):
     """
     patch_size = args.rand_crop_size[0]
 
-    # the first point is always same, and we use it as anchor point, i.e. (x[0], y[0], z[0]) --> (
+    # the first point is always same, and we use it as anchor point, i.e. (x[0], y[0], z[0]) --> (206, 126, 320)
+    # manually test with 1 prompt, 5 prompts and 10 prompts
+    x, y, z = points_dict['x_location'], points_dict['y_location'], points_dict['z_location'] # x with size--> tensor([num_prompts, 1])
+
+    x_m = (torch.max(x) + torch.min(x)) // 2
+    y_m = (torch.max(y) + torch.min(y)) // 2
+    z_m = (torch.max(z) + torch.min(z)) // 2
+
+    # considered transpose in dataloader, e.g. match to real original images
+    d_min = x_m - patch_size // 2
+    d_max = x_m + patch_size // 2
+    h_min = z_m - patch_size // 2
+    h_max = z_m + patch_size // 2
+    w_min = y_m - patch_size // 2
+    w_max = y_m +
