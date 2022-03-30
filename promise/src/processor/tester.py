@@ -24,4 +24,18 @@ def model_predict(args, img, prompt, img_encoder, prompt_encoder, mask_decoder):
                 feature_decoder(feature.to(device), points_torch.clone(), [patch_size, patch_size, patch_size])
             )
         else:
-            new_feature.a
+            new_feature.append(feature.to(device))
+    img_resize = F.interpolate(img[0, 0].permute(1, 2, 0).unsqueeze(0).unsqueeze(0).to(device), scale_factor=64/patch_size,
+                               mode="trilinear")
+    new_feature.append(img_resize)
+    masks = mask_decoder(new_feature, 2, patch_size//64)
+    masks = masks.permute(0, 1, 4, 2, 3)
+    return masks
+
+def get_points_prompt(args, points_dict, cumulative=False):
+    """
+    get prompt tensor (input) with given point-locations
+    """
+    patch_size = args.rand_crop_size[0]
+
+    # the first point is always same, and we use it as anchor point, i.e. (x[0], y[0], z[0]) --> (
