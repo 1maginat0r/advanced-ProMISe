@@ -114,4 +114,16 @@ def get_final_prediction(args, img, seg_dict, points_dict, img_encoder, prompt_e
     seg_pred[:, :, d_min:d_max, h_min:h_max, w_min:w_max] += pred
 
     final_pred = F.interpolate(seg_pred, size=seg.shape[2:], mode="trilinear")
-    img_orig = F.interpolate(img, size=seg.shape[2:], mode="
+    img_orig = F.interpolate(img, size=seg.shape[2:], mode="trilinear")
+
+    # original_image = F.pad(input=img, pad=(0, 1, 0, 0), mode='constant', value=0)
+    return final_pred, img_orig
+
+
+def get_points(prompt, sample):
+    z = torch.where(prompt == 1)[3][sample].unsqueeze(1)  # --> tensor([[x_value]]) instead of tensor([x_value])
+    x = torch.where(prompt == 1)[2][sample].unsqueeze(1)  # ignore: check datasets.py, --> self.spatial_index
+    y = torch.where(prompt == 1)[4][sample].unsqueeze(1)
+    # consider x,y,z here is a,b,c. and abc need to match features after img_encoder with size (b,c,x,z,y)
+    # e.g. a-->x, b-->z, c-->y
+    # xyz are the 
