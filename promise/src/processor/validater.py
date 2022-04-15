@@ -17,4 +17,16 @@ def validater(args, val_data, logger, epoch_num,
             batch_features, feature_list = img_encoder(input_batch)
             feature_list.append(batch_features)
 
-            points_torch = get_points(args, seg, num_positive=10, num_negative=10
+            points_torch = get_points(args, seg, num_positive=10, num_negative=10, split='validation')
+
+            new_feature = []
+            for i, (feature, prompt_encoder) in enumerate(zip(feature_list, prompt_encoder_list)):
+                if i == 3:
+                    new_feature.append(
+                        prompt_encoder(feature, points_torch.clone(), [patch_size, patch_size, patch_size])
+                    )
+                else:
+                    new_feature.append(feature)
+            img_resize = F.interpolate(img[:, 0].permute(0, 2, 3, 1).unsqueeze(1).to(device),
+                                       scale_factor=64 / patch_size,
+                          
