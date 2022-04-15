@@ -216,4 +216,8 @@ def tester(args, logger,
     # all subject
     mean_dice, mean_nsd = np.mean(loss_list), np.mean(loss_nsd_list)
     logger.info("- Test metrics Dice: " + str(mean_dice))
-    logger.info("-
+    logger.info("- Test metrics NSD: " + str(mean_nsd))
+    logger.info("----------------------")
+
+    if args.save_csv:
+        save_csv(args, logger, patient_list, loss_list, loss_nsd_list)
