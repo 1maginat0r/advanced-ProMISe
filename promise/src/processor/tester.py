@@ -175,4 +175,18 @@ def calculate_cost(args,
 def tester(args, logger,
         model_dict, test_data, loss_list, loss_nsd_list,
         loss_function):
-    img_encoder, prompt_en
+    img_encoder, prompt_encoder_list, mask_decoder = model_dict['img_encoder'], model_dict['prompt_encoder_list'], \
+    model_dict['mask_decoder']
+
+    patient_list = []
+
+    for idx, (img, seg, spacing) in enumerate(test_data):
+        print( 'current / total subjects:  {} / {}'
+               .format(idx + 1, len(test_data.dataset.img_dict)))
+        image_path = test_data.dataset.img_dict[idx]
+        image_data = nib.load(image_path)
+
+        if args.data == 'pancreas':
+            patient_name = test_data.dataset.img_dict[idx].split('/')[-2] + '.nii.gz'
+        else:
+            patient_name = test_data.dataset.img_dict[idx].split('/')[-1]
