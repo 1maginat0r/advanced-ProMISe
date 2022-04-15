@@ -190,3 +190,17 @@ def tester(args, logger,
             patient_name = test_data.dataset.img_dict[idx].split('/')[-2] + '.nii.gz'
         else:
             patient_name = test_data.dataset.img_dict[idx].split('/')[-1]
+
+        patient_list.append(patient_name)
+
+        img, seg_dict, points_dict = get_input(args, img, seg) # get input and point prompt
+
+        # pred
+        final_pred, img_orig_space = get_final_prediction(args, img, seg_dict, points_dict, img_encoder,
+                                                                      prompt_encoder_list, mask_decoder)
+
+        masks = final_pred > 0.5
+        loss_list, loss_nsd_list, loss, nsd = calculate_cost(args,
+                                                  masks, seg_dict['seg'],
+                                                  loss_function, spacing,
+            
