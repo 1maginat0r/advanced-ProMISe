@@ -139,4 +139,22 @@ def get_points_location(args, prompt):
 
     # this x, y, z location follows the original after change spatial_index
     points_dict = {'x_location': x, 'y_location': y, 'z_location': z,
-                   'x_dimension': prompt.shape[2], 'y_dimension': prompt.shape[3], 'z_dimension':
+                   'x_dimension': prompt.shape[2], 'y_dimension': prompt.shape[3], 'z_dimension': prompt.shape[4]}
+    return points_dict
+def get_input(args, img, seg):
+    seg = seg.float().unsqueeze(0)
+    seg = seg.to(args.device)
+    img = img.to(args.device)
+    prompt = F.interpolate(seg, img.shape[2:], mode="nearest")
+    points_dict = get_points_location(args, prompt)
+    seg_dict = {'seg': seg, 'prompt': prompt}
+    return img, seg_dict, points_dict
+
+
+def calculate_cost(args,
+                   prediction, ground_truth,
+                   loss_function, spacing,
+                   loss_list, loss_nsd_list):
+
+    loss = 1 - loss_function(prediction, ground_truth)
+    lo
