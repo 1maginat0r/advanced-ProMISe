@@ -126,4 +126,17 @@ def get_points(prompt, sample):
     y = torch.where(prompt == 1)[4][sample].unsqueeze(1)
     # consider x,y,z here is a,b,c. and abc need to match features after img_encoder with size (b,c,x,z,y)
     # e.g. a-->x, b-->z, c-->y
-    # xyz are the 
+    # xyz are the coordinates after dataloader, e.g. without consider the self.spatial_index
+    return x, y, z
+def get_points_location(args, prompt):
+    """
+    use this to get anchor points
+    """
+    l = len(torch.where(prompt == 1)[0])
+    sample = np.random.choice(np.arange(l), args.num_prompts, replace=True)
+    x, y, z = get_points(prompt, sample)
+
+
+    # this x, y, z location follows the original after change spatial_index
+    points_dict = {'x_location': x, 'y_location': y, 'z_location': z,
+                   'x_dimension': prompt.shape[2], 'y_dimension': prompt.shape[3], 'z_dimension':
