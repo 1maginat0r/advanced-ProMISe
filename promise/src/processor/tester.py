@@ -157,4 +157,22 @@ def calculate_cost(args,
                    loss_list, loss_nsd_list):
 
     loss = 1 - loss_function(prediction, ground_truth)
-    lo
+    loss_value = loss.squeeze(0).squeeze(0).squeeze(0).squeeze(0).squeeze(0).detach().cpu().numpy()
+
+    ssd = surface_distance.compute_surface_distances(
+        (ground_truth == 1)[0, 0].cpu().numpy(),
+        (prediction == 1)[0, 0].cpu().numpy(),
+        spacing_mm=spacing[0].numpy()
+    )
+    nsd = metrics.compute_surface_dice_at_tolerance(ssd, args.tolerance)
+
+    loss_list.append(loss_value)
+    loss_nsd_list.append(nsd)
+
+    return loss_list, loss_nsd_list, loss_value, nsd
+
+
+def tester(args, logger,
+        model_dict, test_data, loss_list, loss_nsd_list,
+        loss_function):
+    img_encoder, prompt_en
