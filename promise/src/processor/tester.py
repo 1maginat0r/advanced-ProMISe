@@ -203,4 +203,17 @@ def tester(args, logger,
         loss_list, loss_nsd_list, loss, nsd = calculate_cost(args,
                                                   masks, seg_dict['seg'],
                                                   loss_function, spacing,
-            
+                                                  loss_list, loss_nsd_list)
+        # print(1 - loss_function(masks, seg))
+        logger.info(
+            " Case {}/{} {} - Dice {:.6f} | NSD {:.6f}".format(
+                idx + 1, len(test_data.dataset.img_dict), test_data.dataset.img_dict[idx], loss.item(), nsd))
+
+        if args.save_predictions:
+            save_predict(args, logger, final_pred, seg_dict['seg'], masks, points_dict, idx, test_data, image_data, patient_name) # coordinates are recorded in the log file
+
+
+    # all subject
+    mean_dice, mean_nsd = np.mean(loss_list), np.mean(loss_nsd_list)
+    logger.info("- Test metrics Dice: " + str(mean_dice))
+    logger.info("-
