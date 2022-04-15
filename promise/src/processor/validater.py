@@ -29,4 +29,15 @@ def validater(args, val_data, logger, epoch_num,
                     new_feature.append(feature)
             img_resize = F.interpolate(img[:, 0].permute(0, 2, 3, 1).unsqueeze(1).to(device),
                                        scale_factor=64 / patch_size,
-                          
+                                       mode='trilinear')
+            new_feature.append(img_resize)
+            masks = mask_decoder(new_feature, 2, patch_size // 64)
+            masks = masks.permute(0, 1, 4, 2, 3)
+            seg = seg.to(device)
+            seg = seg.unsqueeze(1)
+            loss = loss_validation(masks, seg)
+            loss_summary.append(loss.detach().cpu().numpy())
+            logger.info(
+                'epoch: {}/{}, iter: {}/{}'.format(epoch_num, args.max_epoch, idx, len(val_data)) + ": loss:" + str(
+                    loss_summary[-1].flatten()[0]))
+        logger.info("- Val metrics: " + str(np.mean(loss_summary)))
