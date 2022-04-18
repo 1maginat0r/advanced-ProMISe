@@ -41,3 +41,4 @@ def validater(args, val_data, logger, epoch_num,
                 'epoch: {}/{}, iter: {}/{}'.format(epoch_num, args.max_epoch, idx, len(val_data)) + ": loss:" + str(
                     loss_summary[-1].flatten()[0]))
         logger.info("- Val metrics: " + str(np.mean(loss_summary)))
+    return loss_summary
